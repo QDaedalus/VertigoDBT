@@ -1,0 +1,90 @@
+version: 2
+
+models:
+  - name: daily_metrics # This should match your model's file name (e.g., daily_metrics.sql)
+    description: "Daily aggregated metrics for user activity and revenue."
+    columns:
+      - name: event_date
+        description: "The date of the user activity."
+        data_type: date
+        tests:
+          - not_null
+          - unique:
+              # By using a unique combination test, we ensure each row is unique
+              column_names:
+                - event_date
+                - country
+                - platform
+      
+      - name: country
+        description: "The country of the user."
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: platform
+        description: "The user's device platform (e.g., iOS, Android)."
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: DAU
+        description: "Daily active users."
+        data_type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_positive
+
+      - name: total_iap_revenue
+        description: "Total revenue from in-app purchases."
+        data_type: decimal
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_positive
+
+      - name: total_ad_revenue
+        description: "Total revenue from in-app advertisements."
+        data_type: decimal
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_positive
+      
+      - name: arpdau
+        description: "Average Revenue Per Daily Active User."
+        data_type: decimal
+        tests:
+          - dbt_expectations.expect_column_values_to_be_positive
+
+      - name: matches_started
+        description: "Total count of matches started."
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_positive
+
+      - name: match_per_dau
+        description: "Average number of matches started per DAU."
+        data_type: decimal
+        tests:
+          - dbt_expectations.expect_column_values_to_be_positive
+
+      - name: win_ratio
+        description: "The ratio of victories to total matches played."
+        data_type: decimal
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1
+
+      - name: defeat_ratio
+        description: "The ratio of defeats to total matches played."
+        data_type: decimal
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1
+
+      - name: server_error_per_dau
+        description: "The average number of server errors per DAU."
+        data_type: decimal
+        tests:
+          - dbt_expectations.expect_column_values_to_be_positive
