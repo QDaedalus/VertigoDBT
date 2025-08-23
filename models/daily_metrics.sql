@@ -20,7 +20,7 @@ SELECT
     
 
 FROM
-    vertigo_user_raw.raw_merged
+    {{ ref('raw_merged') }}
 GROUP BY
     1, 2, 3
 ORDER BY
@@ -36,6 +36,7 @@ SELECT
     DAU,
     total_iap_revenue,
     total_ad_revenue,
+    (total_iap_revenue + total_ad_revenue) / DAU AS arpdau,
     matches_started,
     matches_started / NULLIF(DAU, 0) AS match_per_dau,
     sum_victory_count / NULLIF(sum_match_end_count, 0) AS win_ratio,
